@@ -1,0 +1,136 @@
+1.Write a program to input an uppercase letter and display its corresponding lowercase letter
+
+.MODEL SMALL
+   .STACK 100H
+   .DATA
+        CR EQU 0DH
+        LF EQU 0AH
+   MSG1 DB 'ENTER A UPPER CASE LETTER: $'
+   MSG2 DB 0DH, 0AH,'IN LOWER CASE IT IS: '
+   CHAR DB ?,'$'
+   
+   .CODE
+   MAIN PROC
+    MOV AX,@DATA    		;get data segment
+    MOV DS, AX       		;initialize DS
+    
+    LEA DX, MSG1     		;get first message
+    MOV AH, 9        		;display string function
+    INT 21H         		;display first message
+    
+    MOV AH, 1        		;read character function
+    INT 21H         		;read a capital letter into AL
+    ADD AL, 20H      		;convert it to lower case
+    MOV CHAR, AL     		;store it
+    LEA DX, MSG2     		;get second message
+    MOV AH,9        		;display string function
+    INT 21H         		;display second message and lower case letter in front
+    
+    MOV AH,4CH      
+    INT 21H         		;DOS exit
+    
+    MAIN ENDP
+   END MAIN
+
+2.Write a program to read two decimal digits whose sum is less than 10 and display them and
+their sum in the next line with appropriate message.
+
+.MODEL SMALL
+.STACK 100H
+.DATA
+    prompt1 DB 'Enter the first decimal digit (0-9): $'
+    prompt2 DB 0DH, 0AH, 'Enter the second decimal digit (0-9): $'
+    result_msg DB 0DH, 0AH, 'The digits are: $'
+    sum_msg DB 0DH, 0AH, 'Their sum is: $'
+    error_msg DB 0DH, 0AH, 'Invalid input or sum >= 10. $'
+    first_digit DB ?
+    second_digit DB ?
+    sum DB ?
+.CODE
+MAIN PROC
+    MOV AX, @DATA      ; Load data segment
+    MOV DS, AX
+
+                       ; Prompt and read the first digit
+    LEA DX, prompt1
+    MOV AH, 09H        ; Display string
+    INT 21H
+
+    MOV AH, 01H        ; Read character
+    INT 21H
+    SUB AL, '0'        ; Convert ASCII to decimal
+    MOV first_digit, AL
+    CMP AL, 9
+    JA INVALID_INPUT   ; Check if valid digit (0-9)
+
+                       ; Prompt and read the second digit
+    LEA DX, prompt2
+    MOV AH, 09H        ; Display string
+    INT 21H
+
+    MOV AH, 01H        ; Read character
+    INT 21H
+    SUB AL, '0'        ; Convert ASCII to decimal
+    MOV second_digit, AL
+    CMP AL, 9
+    JA INVALID_INPUT   ; Check if valid digit (0-9)
+
+                       ; Compute sum
+    MOV AL, first_digit
+    ADD AL, second_digit
+    MOV sum, AL
+    CMP AL, 10
+    JGE INVALID_INPUT  ; Check if sum >= 10
+
+    ; Display digits and their sum
+    LEA DX, result_msg
+    MOV AH, 09H        ; Display string
+    INT 21H
+
+    ; Display first digit
+    MOV AL, first_digit
+    ADD AL, '0'        ; Convert to ASCII
+    MOV DL, AL
+    MOV AH, 02H
+    INT 21H
+
+    ; Display space
+    MOV DL, ' '
+    MOV AH, 02H
+    INT 21H
+
+    ; Display second digit
+    MOV AL, second_digit
+    ADD AL, '0'        ; Convert to ASCII
+    MOV DL, AL
+    MOV AH, 02H
+    INT 21H
+
+    ; Display sum message
+    LEA DX, sum_msg
+    MOV AH, 09H        ; Display string
+    INT 21H
+
+                        
+    MOV AL, sum
+    ADD AL, '0'        ; Convert to ASCII
+    MOV DL, AL
+    MOV AH, 02H
+    INT 21H
+
+                        
+    MOV AH, 4CH
+    INT 21H
+
+INVALID_INPUT:
+                        ; Display error message
+    LEA DX, error_msg
+    MOV AH, 09H
+    INT 21H
+
+                       
+    MOV AH, 4CH
+    INT 21H
+
+MAIN ENDP
+END MAIN
